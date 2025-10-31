@@ -1,6 +1,7 @@
 
 
 # 🍳 FoodVisionAI — Intelligent Recipe Generator
+https://github.com/5CCSACCA/coursework-asalmenov
 ## Project Description
 
 FoodVisionAI is a cloud-based application that identifies food items from images and suggests creative recipe ideas using those detected ingredients. The system combines computer vision and natural language processing to help users reduce food waste and discover new meal ideas.
