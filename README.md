@@ -1,6 +1,6 @@
 
 
-# 🍳 FoodVisionAI — Intelligent Recipe Generator
+# FoodVisionAI — Intelligent Recipe Generator
 https://github.com/5CCSACCA/coursework-asalmenov
 ## Project Description
 
