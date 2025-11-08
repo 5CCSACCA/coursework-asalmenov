@@ -1,0 +1,5 @@
+* main                                          95968c1 [origin/main] Create requirements.txt
+  remotes/origin/HEAD                           -> origin/main
+  remotes/origin/develop                        95968c1 Create requirements.txt
+  remotes/origin/feature/stage-1-yolo-inference d661177 Added core dependencies and optional tooling into requirements.txt
+  remotes/origin/main                           95968c1 Create requirements.txt
