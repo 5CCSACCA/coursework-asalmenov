@@ -1,1 +1,3 @@
 These are the extra review notes apart from the code.
+Gitflow: this repository uses gitflow, however, release and hotfix branches are not used. Please follow the gitflow branching model for future development.
+This review focuses on the main branch, which is currently empty. Please ensure that future commits to the main branch adhere to the project's coding standards and guidelines.
