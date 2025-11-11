@@ -1,1 +1,12 @@
+# --- Core dependencies ---
+ultralytics==8.3.0          # YOLO11n model + inference API
+torch>=2.0.0                # PyTorch backend for YOLO
+numpy>=1.24.0               # Array ops for image handling
+pillow>=10.0.0              # Image I/O and conversion
+opencv-python-headless>=4.8 # OpenCV without GUI (headless env)
 
+# --- Optional tooling (safe for later stages) ---
+fastapi>=0.111.0            # For Stage 3 API
+uvicorn>=0.30.0             # FastAPI server
+pytest>=8.0.0               # Unit testing (Stage 10)
+python-dotenv>=1.0.0        # For managing .env config (Stage 11 security)
