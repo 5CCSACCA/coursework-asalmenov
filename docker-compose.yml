@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  yolo-service:
+    build: .
+    container_name: yolo-service
+    command: python -m services.yolo.cli --image docs/examples/apple.jpg
+    volumes:
+      - .:/app
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 16g
