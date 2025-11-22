@@ -4,7 +4,6 @@ services:
   yolo-service:
     build: .
     container_name: yolo-service
-    command: python -m services.yolo.cli --image docs/examples/apple.jpg
     ports:
       - "8000:8000"
     deploy:
