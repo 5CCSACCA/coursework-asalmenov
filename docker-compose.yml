@@ -4,8 +4,13 @@ services:
   yolo-service:
     build: .
     container_name: yolo-service
+    command: uvicorn services.yolo.api:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/config/firebase-service-account.json
+    volumes:
+      - ./config/firebase-service-account.json:/app/config/firebase-service-account.json:ro
     deploy:
       resources:
         limits:
