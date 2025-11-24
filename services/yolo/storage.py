@@ -1,12 +1,10 @@
-# services/yolo/storage.py
-
-import os
 from typing import Any, Dict, List, Optional
+import os
 
 import firebase_admin
 from firebase_admin import credentials, firestore
+from datetime import datetime
 
-# We’ll use Firestore to store model outputs as documents
 _db: Optional[firestore.Client] = None
 
 
@@ -30,17 +28,9 @@ def init_firebase() -> None:
         "config/firebase-service-account.json",
     )
 
-    # If file doesn't exist or is a directory -> skip Firebase
+    # If file doesn't exist -> skip Firebase entirely
     if not os.path.isfile(cred_path):
         print(f"[Firebase] Warning: credentials file not found at {cred_path}. Skipping Firebase init.")
-        return
-
-    # Quick sanity check: is it valid JSON?
-    try:
-        with open(cred_path, "r", encoding="utf-8") as f:
-            json.load(f)
-    except Exception as e:
-        print(f"[Firebase] Warning: invalid credentials JSON at {cred_path}: {e}. Skipping Firebase init.")
         return
 
     try:
@@ -52,28 +42,38 @@ def init_firebase() -> None:
         print(f"[Firebase] Warning: failed to initialise Firebase: {e}. Skipping.")
         _db = None
 
-def _collection():
-    if _db is None:
-        raise RuntimeError("Firebase not initialised. Call init_firebase() first.")
-    return _db.collection("predictions")  # Firestore collection name
 
-
-def save_output(payload: Dict[str, Any]) -> str:
+def save_output(payload: Dict[str, Any]) -> Optional[str]:
     """
     Save a model output document to Firebase.
-    Returns the Firebase document ID.
+    Returns the document ID, or None if Firebase is not available.
     """
-    doc_ref = _collection().document()  # auto-id
-    doc_ref.set(payload)
+    if _db is None:
+        print("[Firebase] save_output called but Firebase is not initialised. Skipping.")
+        return None
+
+    # Use a fixed collection name
+    collection = _db.collection("predictions")
+    data = dict(payload)
+    data.setdefault("created_at", datetime.utcnow().isoformat())
+
+    doc_ref = collection.document()  # auto-id
+    doc_ref.set(data)
     return doc_ref.id
 
 
 def list_outputs(limit: int = 50) -> List[Dict[str, Any]]:
     """
     List the most recent model outputs from Firebase.
+    Returns an empty list if Firebase is not available.
     """
+    if _db is None:
+        print("[Firebase] list_outputs called but Firebase is not initialised. Returning empty list.")
+        return []
+
+    collection = _db.collection("predictions")
     docs = (
-        _collection()
+        collection
         .order_by("created_at", direction=firestore.Query.DESCENDING)
         .limit(limit)
         .stream()
@@ -84,12 +84,22 @@ def list_outputs(limit: int = 50) -> List[Dict[str, Any]]:
 def update_output(doc_id: str, updates: Dict[str, Any]) -> None:
     """
     Update a stored model output in Firebase.
+    No-op if Firebase is not available.
     """
-    _collection().document(doc_id).update(updates)
+    if _db is None:
+        print("[Firebase] update_output called but Firebase is not initialised. Skipping.")
+        return
+
+    _db.collection("predictions").document(doc_id).update(updates)
 
 
 def delete_output(doc_id: str) -> None:
     """
     Delete a stored model output from Firebase.
+    No-op if Firebase is not available.
     """
-    _collection().document(doc_id).delete()
+    if _db is None:
+        print("[Firebase] delete_output called but Firebase is not initialised. Skipping.")
+        return
+
+    _db.collection("predictions").document(doc_id).delete()
