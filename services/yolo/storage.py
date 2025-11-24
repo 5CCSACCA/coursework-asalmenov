@@ -12,34 +12,45 @@ _db: Optional[firestore.Client] = None
 
 def init_firebase() -> None:
     """
-    Initialise Firebase Admin SDK and Firestore client.
-    Expects:
-      - GOOGLE_APPLICATION_CREDENTIALS env var pointing to service account JSON
-      - (optional) FIREBASE_PROJECT_ID if needed
+    Best-effort Firebase init.
+    If credentials file is missing or invalid, just log a warning and skip.
     """
     global _db
 
     if _db is not None:
         return  # already initialised
 
-    # If an app is already initialised (e.g. by tests), reuse it
-    if not firebase_admin._apps:
-        cred_path = os.getenv(
-            "GOOGLE_APPLICATION_CREDENTIALS",
-            "config/firebase-service-account.json",  # default path inside container
-        )
-        if not os.path.exists(cred_path):
-            # In case the marker doesn’t mount real credentials, fail gracefully
-            raise RuntimeError(
-                f"Firebase credentials not found at {cred_path}. "
-                "Set GOOGLE_APPLICATION_CREDENTIALS or mount the JSON file."
-            )
+    # Reuse existing app if already initialised
+    if firebase_admin._apps:
+        _db = firestore.client()
+        return
 
+    cred_path = os.getenv(
+        "GOOGLE_APPLICATION_CREDENTIALS",
+        "config/firebase-service-account.json",
+    )
+
+    # If file doesn't exist or is a directory -> skip Firebase
+    if not os.path.isfile(cred_path):
+        print(f"[Firebase] Warning: credentials file not found at {cred_path}. Skipping Firebase init.")
+        return
+
+    # Quick sanity check: is it valid JSON?
+    try:
+        with open(cred_path, "r", encoding="utf-8") as f:
+            json.load(f)
+    except Exception as e:
+        print(f"[Firebase] Warning: invalid credentials JSON at {cred_path}: {e}. Skipping Firebase init.")
+        return
+
+    try:
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
-
-    _db = firestore.client()
-
+        _db = firestore.client()
+        print("[Firebase] Initialised Firestore client.")
+    except Exception as e:
+        print(f"[Firebase] Warning: failed to initialise Firebase: {e}. Skipping.")
+        _db = None
 
 def _collection():
     if _db is None:
