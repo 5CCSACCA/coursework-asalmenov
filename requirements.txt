@@ -4,9 +4,12 @@ numpy>=1.24.0
 pillow>=10.0.0
 opencv-python-headless>=4.8
 
-# --- Optional tooling (later stages) ---
+# --- API & tooling ---
 fastapi>=0.111.0
 uvicorn>=0.30.0
 pytest>=8.0.0
 python-dotenv>=1.0.0
 python-multipart>=0.0.9
+
+# --- Stage 5: Firebase ---
+firebase-admin>=6.0.0
