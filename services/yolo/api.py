@@ -5,6 +5,7 @@ from services.yolo.model import YoloService
 from services.yolo.storage import init_firebase, save_output, list_outputs, update_output, delete_output
 from datetime import datetime
 from typing import Any, Dict
+from services.yolo.mq import publish_yolo_output
 
 app = FastAPI(
     title="YOLO11n Inference API",
