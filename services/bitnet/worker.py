@@ -6,6 +6,7 @@ from typing import Any, Dict
 import pika
 from pika.exceptions import AMQPConnectionError
 
+print("[BitNet] Module imported.")
 
 def get_rabbitmq_url() -> str:
     return os.getenv("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
@@ -76,6 +77,7 @@ def start_worker() -> None:
 
 
 def main() -> None:
+    print("[BitNet] main() starting.")
     start_worker()
 
 
