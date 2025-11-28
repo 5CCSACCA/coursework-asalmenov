@@ -12,7 +12,6 @@ app = FastAPI(
     description="Stage 3 FastAPI YOLO inference service"
 )
 
-# Load YOLO once at startup
 svc = YoloService()
 
 @app.on_event("startup")
@@ -37,24 +36,26 @@ async def predict(file: UploadFile = File(...)):
         confidence = float(top.get("confidence", 0.0))
         created_at = datetime.utcnow().isoformat()
 
-        # 1) Local SQLite log (Stage 4)
         log_prediction(
             filename=filename,
             label=label,
             confidence=confidence,
         )
 
-        # 2) Firebase log (Stage 5)
         firebase_payload = {
             "filename": filename,
             "label": label,
             "confidence": confidence,
             "created_at": created_at,
-            "raw_result": result,  # full YOLO output if you want
+            "raw_result": result,
         }
         firebase_id = save_output(firebase_payload)
 
-    # attach firebase_id so clients can later update/delete
+    try:
+        publish_yolo_output(result)
+    except Exception as e:
+        print(f"[Stage6] Warning: failed to publish to RabbitMQ: {e}")
+
     response_body = dict(result)
     if firebase_id is not None:
         response_body["firebase_id"] = firebase_id

@@ -16,9 +16,8 @@ def init_firebase() -> None:
     global _db
 
     if _db is not None:
-        return  # already initialised
+        return
 
-    # Reuse existing app if already initialised
     if firebase_admin._apps:
         _db = firestore.client()
         return
@@ -28,7 +27,6 @@ def init_firebase() -> None:
         "config/firebase-service-account.json",
     )
 
-    # If file doesn't exist -> skip Firebase entirely
     if not os.path.isfile(cred_path):
         print(f"[Firebase] Warning: credentials file not found at {cred_path}. Skipping Firebase init.")
         return
@@ -52,12 +50,11 @@ def save_output(payload: Dict[str, Any]) -> Optional[str]:
         print("[Firebase] save_output called but Firebase is not initialised. Skipping.")
         return None
 
-    # Use a fixed collection name
     collection = _db.collection("predictions")
     data = dict(payload)
     data.setdefault("created_at", datetime.utcnow().isoformat())
 
-    doc_ref = collection.document()  # auto-id
+    doc_ref = collection.document()
     doc_ref.set(data)
     return doc_ref.id
 
