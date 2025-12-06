@@ -23,8 +23,8 @@ def init_firebase() -> None:
         return
 
     cred_path = os.getenv(
-        "GOOGLE_APPLICATION_CREDENTIALS",
-        "config/firebase-service-account.json",
+        "FIREBASE_CREDENTIALS_PATH",
+        "firebase/coursework-asalmenov-firebase-adminsdk-fbsvc-d4a5f98d94.json",
     )
 
     if not os.path.isfile(cred_path):
