@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from services.yolo.db import init_db, log_prediction, list_predictions
 from services.yolo.model import YoloService
@@ -6,6 +6,7 @@ from services.yolo.storage import init_firebase, save_output, list_outputs, upda
 from datetime import datetime
 from typing import Any, Dict
 from services.yolo.mq import publish_yolo_output
+from services.yolo.auth import get_current_user
 
 app = FastAPI(
     title="YOLO11n Inference API",
@@ -21,7 +22,10 @@ def on_startup() -> None:
     init_firebase()
 
 @app.post("/predict")
-async def predict(file: UploadFile = File(...)):
+async def predict(
+    file: UploadFile = File(...),
+    user: Dict[str, Any] = Depends(get_current_user),
+):
     if file.content_type not in ("image/jpeg", "image/png", "image/jpg"):
         raise HTTPException(400, "Unsupported file type")
 
@@ -64,14 +68,20 @@ async def predict(file: UploadFile = File(...)):
     return JSONResponse(content=response_body)
 
 @app.get("/predictions")
-def get_predictions(limit: int = 50):
+def get_predictions(
+    limit: int = 50,
+    user: Dict[str, Any] = Depends(get_current_user),
+):
     """
     Return the most recent logged predictions.
     """
     return list_predictions(limit=limit)
 
 @app.get("/firebase/predictions")
-def get_firebase_predictions(limit: int = 50):
+def get_firebase_predictions(
+    limit: int = 50,
+    user: Dict[str, Any] = Depends(get_current_user),
+):
     """
     List model outputs stored in Firebase.
     """
@@ -79,7 +89,11 @@ def get_firebase_predictions(limit: int = 50):
 
 
 @app.put("/firebase/predictions/{doc_id}")
-def update_firebase_prediction(doc_id: str, updates: Dict[str, Any]):
+def update_firebase_prediction(
+    doc_id: str,
+    updates: Dict[str, Any],
+    user: Dict[str, Any] = Depends(get_current_user),
+):
     """
     Update a stored model output in Firebase.
     For example, to correct a label or add notes.
@@ -91,7 +105,10 @@ def update_firebase_prediction(doc_id: str, updates: Dict[str, Any]):
 
 
 @app.delete("/firebase/predictions/{doc_id}")
-def delete_firebase_prediction(doc_id: str):
+def delete_firebase_prediction(
+    doc_id: str,
+    user: Dict[str, Any] = Depends(get_current_user),
+):
     """
     Delete a stored model output from Firebase.
     """
