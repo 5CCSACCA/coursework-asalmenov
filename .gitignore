@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+.env.*
+
+# Virtual environments
+venv/
+.venv/
+
+# Logs
+*.log
+
+# OS junk files
+.DS_Store
+
+# Docker
+*.pid
+
+# Ignore any firebase keys EXCEPT the one you explicitly committed
+firebase/*.old.json
+firebase/*backup*.json
