@@ -36,5 +36,6 @@ services:
     command: python -m services.bitnet.worker
     environment:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - PYTHONUNBUFFERED=1
     depends_on:
       - rabbitmq
