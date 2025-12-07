@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Any, Dict
 from services.yolo.mq import publish_yolo_output
 from services.yolo.auth import get_current_user
+import time
 
 app = FastAPI(
     title="YOLO11n Inference API",
@@ -21,6 +22,10 @@ def on_startup() -> None:
     init_db()
     init_firebase()
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 @app.post("/predict")
 async def predict(
     file: UploadFile = File(...),
@@ -30,7 +35,11 @@ async def predict(
         raise HTTPException(400, "Unsupported file type")
 
     data = await file.read()
+
+    start = time.time()
     result = svc.predict(data)
+    duration = time.time() - start
+    print(f"[Monitor] YOLO inference time: {duration:.4f} seconds")
 
     firebase_id = None
 
