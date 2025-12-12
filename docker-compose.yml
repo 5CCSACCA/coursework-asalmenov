@@ -8,8 +8,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_USER=fooduser
+      - RABBITMQ_DEFAULT_PASS=foodpass123
 
   yolo-service:
     build: .
@@ -19,23 +19,18 @@ services:
       - "8000:8000"
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/app/config/firebase-service-account.json
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_URL=amqp://fooduser:foodpass123@rabbitmq:5672/
     volumes:
       - ./config/firebase-service-account.json:/app/config/firebase-service-account.json:ro
     depends_on:
       - rabbitmq
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 4g
 
   bitnet-service:
     build: .
     container_name: bitnet-service
     command: python -m services.bitnet.worker
     environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_URL=amqp://fooduser:foodpass123@rabbitmq:5672/
       - PYTHONUNBUFFERED=1
     depends_on:
       - rabbitmq
