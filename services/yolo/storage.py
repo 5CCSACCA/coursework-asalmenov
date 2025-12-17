@@ -24,7 +24,7 @@ def init_firebase() -> None:
 
     cred_path = os.getenv(
         "FIREBASE_CREDENTIALS_PATH",
-        "firebase/coursework-asalmenov-firebase-adminsdk-fbsvc-d4a5f98d94.json",
+        "config/firebase-storage-account.json",
     )
 
     if not os.path.isfile(cred_path):
