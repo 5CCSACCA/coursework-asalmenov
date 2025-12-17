@@ -17,7 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY services/ ./services/
 COPY docs/ ./docs/
-COPY firebase/ ./firebase/
 
 EXPOSE 8000
 

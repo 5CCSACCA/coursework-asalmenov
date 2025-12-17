@@ -6,7 +6,6 @@ opencv-python-headless>=4.8
 fastapi>=0.111.0
 uvicorn>=0.30.0
 pytest>=8.0.0
-python-dotenv>=1.0.0
 python-multipart>=0.0.9
 
 firebase-admin>=6.0.0
