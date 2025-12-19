@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 
 from services.yolo import api
 from services.yolo.auth import get_current_user
+from services.yolo.db import init_db
 
 class DummyYoloService:
     def predict(self, data: bytes):
@@ -36,8 +37,9 @@ def test_protected_endpoint_requires_auth():
 
 def test_predict_with_dummy_yolo_and_fake_auth(tmp_path, monkeypatch):
     api.app.dependency_overrides[get_current_user] = lambda: {"uid": "test-user"}
-
     api.svc = DummyYoloService()
+
+    init_db()
 
     client = TestClient(api.app)
 
